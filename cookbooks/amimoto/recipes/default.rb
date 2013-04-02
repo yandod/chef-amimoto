@@ -7,7 +7,7 @@ end
 #yum -y update
 %w{zip unzip wget iptables}.each do |package_name|
   package package_name do
-    action :install
+    action [:install,:upgrade]
   end
 end
 
@@ -16,21 +16,19 @@ template "/etc/sysconfig/iptables" do
 end
 
 service "iptables" do
-  action [:enable,:restart]
+  action [:enable, :restart]
 end
 
-#if [ -f /etc/sysconfig/iptables ]; then
-#  mv /etc/sysconfig/iptables /etc/sysconfig/iptables.origin
-#fi
-#cp etc/sysconfig/iptables /etc/sysconfig/iptables
-#service iptables restart; chkconfig iptables on
-#iptables -L
-#
-#rpm --import http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL
-#rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-#yum install -y denyhosts
-#service denyhosts start; chkconfig denyhosts on
-#
+include_recipe "yum::epel"
+
+package "denyhosts" do
+  action [:install,:upgrade]
+end
+
+service "denyhosts" do
+  action [:enable, :restart]
+end
+
 #yum install -y memcached
 #service memcached start; chkconfig memcached on
 #
