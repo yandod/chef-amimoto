@@ -104,17 +104,28 @@ end
   end
 end
 
-#cp etc/php-fpm.conf /etc/
-#cp -Rf etc/php-fpm.d/* /etc/php-fpm.d/
-#rm -Rf /var/log/php-fpm/*
-#service php-fpm start; chkconfig php-fpm on
-#
-#mkdir -p /var/tmp/php/session
-#mkdir /var/www/vhosts
-#chown -R nginx:nginx /var/tmp/php/session
-#chown -R nginx:nginx /var/log/php-fpm
-#chown -R nginx:nginx /var/www/vhosts
-#
+template "/etc/php-fpm.conf" do
+  source "php-fpm.conf.erb"
+end
+
+template "/etc/php-fpm.d/www.conf" do
+  source "www.conf.erb"
+end
+
+service "php-fpm" do
+  action [:enable, :restart]
+end
+
+%w{/var/tmp/php/session /var/www/vhosts /var/log/php-fpm}.each do |dir_name|
+  directory dir_name do
+    owner "nginx"
+    group "nginx"
+    mode 00644
+    recursive true
+    action :create
+  end
+end
+
 #cp usr/local/bin/wp-setup /usr/local/bin/; chmod +x /usr/local/bin/wp-setup
 #cp usr/local/bin/wp-replace-siteurl /usr/local/bin/; chmod +x /usr/local/bin/wp-replace-siteurl
 #
