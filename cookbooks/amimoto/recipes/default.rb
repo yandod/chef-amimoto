@@ -7,8 +7,17 @@ end
 #yum -y update
 %w{zip unzip wget iptables}.each do |package_name|
   package package_name do
+    arch nil
     action :install
   end
+end
+
+template "/etc/sysconfig/iptables" do
+  source "sysconfig.iptables.erb"
+end
+
+service "iptables" do
+  action [:enable,:restart]
 end
 
 #if [ -f /etc/sysconfig/iptables ]; then
