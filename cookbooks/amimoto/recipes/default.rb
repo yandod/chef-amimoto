@@ -29,9 +29,14 @@ service "denyhosts" do
   action [:enable, :restart]
 end
 
-#yum install -y memcached
-#service memcached start; chkconfig memcached on
-#
+package "memcached" do
+  action [:install,:upgrade]
+end
+
+service "memcached" do
+  action [:enable, :restart]
+end
+
 #rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
 #yum install --enablerepo=remi -y php php-cli php-devel php-mbstring php-gd php-pear php-xml php-fpm php-pecl-apc php-pecl-memcache
 #
