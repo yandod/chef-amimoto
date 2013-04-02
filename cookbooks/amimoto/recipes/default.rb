@@ -7,7 +7,6 @@ end
 #yum -y update
 %w{zip unzip wget iptables}.each do |package_name|
   package package_name do
-    arch nil
     action :install
   end
 end
