@@ -64,16 +64,33 @@ end
 service "nginx" do
   action [:enable, :restart]
 end
-#rpm -ivh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
-#yum install -y nginx
-#service nginx start; chkconfig nginx on
-#
-#rpm --import http://www.percona.com/redir/downloads/percona-release/RPM-GPG-KEY-percona
-#rpm -ivh http://www.percona.com/redir/downloads/percona-release/percona-release-0.0-1.x86_64.rpm
-#yum install -y Percona-Server-server-55 Percona-Server-client-55 Percona-Server-shared-compat
-#service mysql start; chkconfig mysql on
-#
-#yum install --enablerepo=remi -y php-mysqlnd php-mdo phpMyAdmin
+
+cookbook_file "#{Chef::Config[:file_cache_path]}/percona-release-0.0-1.x86_64.rpm" do
+  source "percona-release-0.0-1.x86_64.rpm"
+end
+package "percona-release" do
+  source "#{Chef::Config[:file_cache_path]}/percona-release-0.0-1.x86_64.rpm"
+  action :install
+  provider Chef::Provider::Package::Rpm
+end
+
+# Percona-Server-shared-compat is conflicting
+%w{Percona-Server-server-55 Percona-Server-client-55}.each do |package_name|
+  package package_name do
+    action [:install, :upgrade]
+  end
+end
+
+service "mysql" do
+  action [:enable, :restart]
+end
+
+%w{php-mysqlnd php-pdo phpMyAdmin}.each do |package_name|
+  package package_name do
+    action [:install, :upgrade]
+  end
+end
+
 #sed -e "s/\date\.timezone = \"UTC\"/date\.timezone = \"Asia\/Tokyo\"/" etc/php.ini > /etc/php.ini
 #cp -Rf etc/php.d/* /etc/php.d/
 #cp etc/php-fpm.conf /etc/
