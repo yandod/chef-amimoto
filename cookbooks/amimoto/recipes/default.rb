@@ -91,8 +91,19 @@ end
   end
 end
 
-#sed -e "s/\date\.timezone = \"UTC\"/date\.timezone = \"Asia\/Tokyo\"/" etc/php.ini > /etc/php.ini
-#cp -Rf etc/php.d/* /etc/php.d/
+template "/etc/php.ini" do
+  variables(
+     :timezone => "Asia/Tokyo"
+   )
+  source "php.ini.erb"
+end
+
+%w{apc.ini memcache.ini}.each do |file_name|
+  template "/etc/php.d/" + file_name do
+    source file_name + ".erb"
+  end
+end
+
 #cp etc/php-fpm.conf /etc/
 #cp -Rf etc/php-fpm.d/* /etc/php-fpm.d/
 #rm -Rf /var/log/php-fpm/*
