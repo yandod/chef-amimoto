@@ -37,10 +37,33 @@ service "memcached" do
   action [:enable, :restart]
 end
 
-#rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
-#yum install --enablerepo=remi -y php php-cli php-devel php-mbstring php-gd php-pear php-xml php-fpm php-pecl-apc php-pecl-memcache
-#
-#service httpd stop > /dev/null 2>&1; chkconfig httpd off
+include_recipe "yum::remi"
+%w{php php-cli php-devel php-mbstring php-gd php-pear php-xml php-fpm php-pecl-apc php-pecl-memcache}.each do |package_name|
+  package package_name do
+    action [:install, :upgrade]
+  end
+end
+
+service "httpd" do
+  action [:stop, :disable]
+end
+
+remote_file "#{Chef::Config[:file_cache_path]}/nginx-release-centos-6-0.el6.ngx.noarch.rpm" do
+  source "http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm"
+end
+package "nginx-release" do
+  source "#{Chef::Config[:file_cache_path]}/nginx-release-centos-6-0.el6.ngx.noarch.rpm"
+  action :install
+  provider Chef::Provider::Package::Rpm
+end
+
+package "nginx" do
+  action [:install, :upgrade]
+end
+
+service "nginx" do
+  action [:enable, :restart]
+end
 #rpm -ivh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 #yum install -y nginx
 #service nginx start; chkconfig nginx on
