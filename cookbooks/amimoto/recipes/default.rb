@@ -1,11 +1,16 @@
-#!/bin/sh
-#mv /etc/localtime /etc/localtime.bak
-#ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+link "/etc/localtime" do
+    to "/usr/share/zoneinfo/Asia/Tokyo"
+end
+
 #cp etc/motd.jp /etc/motd
 #
 #yum -y update
-#yum install -y zip unzip wget iptables
-#
+%w{zip unzip wget iptables}.each do |package_name|
+  package package_name do
+    action :install
+  end
+end
+
 #if [ -f /etc/sysconfig/iptables ]; then
 #  mv /etc/sysconfig/iptables /etc/sysconfig/iptables.origin
 #fi
